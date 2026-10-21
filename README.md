@@ -5,6 +5,7 @@
 使用 **WPF + WPF-UI 4.3** 构建，界面为 Fluent 深色主题。应用只在你选择的平台之间搬运活动文件，不依赖自建服务器。
 
 - GitHub：[zsm19991230/BikeSync](https://github.com/zsm19991230/BikeSync)
+- Gitee 镜像：[zhaosanmao/bike-sync](https://gitee.com/zhaosanmao/bike-sync)
 
 ![概览](docs/screenshots/dashboard.png)
 
