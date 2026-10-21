@@ -28,7 +28,7 @@ public sealed class UpdateService
     public const string GitHubOwner = "zsm19991230";
     public const string GitHubRepo = "BikeSync";
     public const string GiteeOwner = "zhaosanmao";
-    public const string GiteeRepo = "BikeSync";
+    public const string GiteeRepo = "bike-sync";
 
     public static readonly Uri GitHubReleases =
         new($"https://github.com/{GitHubOwner}/{GitHubRepo}/releases");
