@@ -1,0 +1,403 @@
+<UserControl x:Class="BikeSync.App.Views.SettingsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="1080">
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="0,0,0,12">
+            <Grid Margin="0,4,0,22">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="设置" Style="{StaticResource PageTitleStyle}" />
+                    <TextBlock Text="配置平台应用、凭据与本地文件存储位置。"
+                               Style="{StaticResource PageSubtitleStyle}"
+                               Margin="0,7,0,0" />
+                </StackPanel>
+                <ui:Button Grid.Column="1"
+                           Content="保存设置"
+                           Icon="{ui:SymbolIcon Symbol=Save24}"
+                           Command="{Binding SaveCommand}"
+                           Style="{StaticResource PrimaryButtonStyle}"
+                           VerticalAlignment="Center"
+                           IsEnabled="{Binding IsSaving, Converter={StaticResource InverseBool}}" />
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.25*" />
+                    <ColumnDefinition Width="0.9*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                    <!-- Strava -->
+                    <Border Style="{StaticResource CardStyle}" Padding="22">
+                        <StackPanel>
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="38" Height="38" CornerRadius="11" Background="#FFFC4C02">
+                                        <TextBlock Text="S" Foreground="White" FontSize="18"
+                                                   FontWeight="Bold"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel Margin="11,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock Text="Strava API 应用" FontSize="15"
+                                                   FontWeight="SemiBold" />
+                                        <TextBlock Text="用于 OAuth 登录、拉取活动与上传"
+                                                   Style="{StaticResource CaptionStyle}" />
+                                    </StackPanel>
+                                </StackPanel>
+                                <Border Style="{StaticResource PillStyle}" HorizontalAlignment="Right"
+                                        VerticalAlignment="Top">
+                                    <TextBlock Text="{Binding StravaConfigStatus}"
+                                               FontSize="9.5"
+                                               Foreground="{StaticResource TextSecondaryBrush}" />
+                                </Border>
+                            </Grid>
+
+                            <Border Style="{StaticResource DividerStyle}" Margin="0,16,0,14" />
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,7,0">
+                                    <TextBlock Text="Client ID" Style="{StaticResource EyebrowStyle}"
+                                               Margin="0,0,0,6" />
+                                    <ui:TextBox Text="{Binding StravaClientId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                PlaceholderText="例如 123456"
+                                                Height="40" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="7,0,0,0">
+                                    <TextBlock Text="Client Secret" Style="{StaticResource EyebrowStyle}"
+                                               Margin="0,0,0,6" />
+                                    <ui:PasswordBox Password="{Binding StravaClientSecret, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                    PlaceholderText="粘贴 Client Secret"
+                                                    RevealButtonEnabled="True"
+                                                    Height="40" />
+                                </StackPanel>
+                            </Grid>
+
+                            <TextBlock Text="回调地址（固定）" Style="{StaticResource EyebrowStyle}"
+                                       Margin="0,14,0,6" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Border Background="{StaticResource InputBackgroundBrush}"
+                                        BorderBrush="{StaticResource BorderSoftBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="11,9">
+                                    <TextBlock Text="{Binding CallbackUrl}"
+                                               FontFamily="{StaticResource MonoFontFamily}"
+                                               FontSize="11"
+                                               Foreground="{StaticResource TextSecondaryBrush}" />
+                                </Border>
+                                <ui:Button Grid.Column="1"
+                                           Content="复制"
+                                           Command="{Binding CopyCallbackUrlCommand}"
+                                           Style="{StaticResource SecondaryButtonStyle}"
+                                           Margin="8,0,0,0" />
+                            </Grid>
+
+                            <Border Background="#0DFFFFFF"
+                                    BorderBrush="{StaticResource BorderSoftBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Padding="12"
+                                    Margin="0,14,0,0">
+                                <TextBlock Text="配置步骤：在 Strava API 设置页创建应用，将 Authorization Callback Domain 填为 127.0.0.1，然后回到这里填写 Client ID 和 Secret。只申请 activity:read_all 与 activity:write 权限。"
+                                           Style="{StaticResource CaptionStyle}"
+                                           TextWrapping="Wrap"
+                                           LineHeight="18" />
+                            </Border>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,13,0,0">
+                                <ui:Button Content="打开 Strava API 设置"
+                                           Command="{Binding OpenStravaApiCommand}"
+                                           Style="{StaticResource SecondaryButtonStyle}" />
+                                <ui:Button Content="intervals.icu 设置"
+                                           Command="{Binding OpenIntervalsSettingsCommand}"
+                                           Style="{StaticResource GhostButtonStyle}"
+                                           Margin="5,0,0,0" />
+                                <ui:Button Content="Ride with GPS API"
+                                           Command="{Binding OpenRideWithGpsApiCommand}"
+                                           Style="{StaticResource GhostButtonStyle}"
+                                           Margin="2,0,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Storage -->
+                    <Border Style="{StaticResource CardStyle}" Padding="22" Margin="0,14,0,0">
+                        <StackPanel>
+                            <TextBlock Text="本地存储" Style="{StaticResource SectionTitleStyle}" />
+                            <TextBlock Text="活动文件与本地副本的保存位置。"
+                                       Style="{StaticResource CaptionStyle}"
+                                       Margin="0,5,0,0" />
+                            <TextBlock Text="导出目录" Style="{StaticResource EyebrowStyle}"
+                                       Margin="0,16,0,6" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ui:TextBox Text="{Binding DownloadDirectory, Mode=TwoWay}"
+                                            Height="40"
+                                            FontSize="11" />
+                                <ui:Button Grid.Column="1"
+                                           Content="浏览"
+                                           Command="{Binding BrowseDownloadDirectoryCommand}"
+                                           Style="{StaticResource SecondaryButtonStyle}"
+                                           Margin="8,0,0,0" />
+                                <ui:Button Grid.Column="2"
+                                           Icon="{ui:SymbolIcon Symbol=FolderOpen24}"
+                                           Command="{Binding OpenDownloadDirectoryCommand}"
+                                           Style="{StaticResource GhostButtonStyle}"
+                                           Margin="4,0,0,0"
+                                           ToolTip="打开导出目录" />
+                            </Grid>
+
+                            <CheckBox Content="上传成功后，同时保留一份活动文件到本地"
+                                      IsChecked="{Binding SaveActivityCopies, Mode=TwoWay}"
+                                      Margin="0,14,0,0"
+                                      FontSize="11.5" />
+                            <TextBlock Text="关闭后，文件只在内存中短暂停留并直接上传。"
+                                       Style="{StaticResource CaptionStyle}"
+                                       Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <!-- Security -->
+                    <Border Style="{StaticResource CardStyle}" Padding="22">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Border Width="38" Height="38" CornerRadius="11"
+                                        Background="#1534D399">
+                                    <ui:SymbolIcon Symbol="ShieldCheckmark24" FontSize="19"
+                                                   Foreground="{StaticResource SuccessBrush}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Text="凭据安全"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           Margin="11,0,0,0"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                            <TextBlock Text="所有 OAuth 令牌、刷新令牌和 API Key 都通过 Windows DPAPI（CurrentUser 范围）加密，只有当前 Windows 用户能解密。应用不会上传凭据，也不会在日志中记录明文。"
+                                       Style="{StaticResource CaptionStyle}"
+                                       Margin="0,13,0,0"
+                                       TextWrapping="Wrap"
+                                       LineHeight="19" />
+                            <Border Style="{StaticResource DividerStyle}" Margin="0,14,0,12" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="应用数据目录" FontSize="11.5"
+                                               FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding DataRoot}"
+                                               Style="{StaticResource CaptionStyle}"
+                                               Margin="0,4,0,0"
+                                               TextWrapping="Wrap" />
+                                </StackPanel>
+                                <ui:Button Grid.Column="1"
+                                           Icon="{ui:SymbolIcon Symbol=Open24}"
+                                           Command="{Binding OpenDataDirectoryCommand}"
+                                           Style="{StaticResource GhostButtonStyle}"
+                                           ToolTip="打开数据目录" />
+                            </Grid>
+                            <Grid Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="运行日志" FontSize="11.5"
+                                               FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding LogDirectory}"
+                                               Style="{StaticResource CaptionStyle}"
+                                               Margin="0,4,0,0"
+                                               TextWrapping="Wrap" />
+                                </StackPanel>
+                                <ui:Button Grid.Column="1"
+                                           Icon="{ui:SymbolIcon Symbol=Open24}"
+                                           Command="{Binding OpenLogDirectoryCommand}"
+                                           Style="{StaticResource GhostButtonStyle}"
+                                           ToolTip="打开日志目录" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Platform status -->
+                    <Border Style="{StaticResource CardStyle}" Padding="22" Margin="0,14,0,0">
+                        <StackPanel>
+                            <TextBlock Text="凭据获取入口" Style="{StaticResource SectionTitleStyle}" />
+                            <TextBlock Text="intervals.icu 与 Ride with GPS 使用个人 API 凭据，无需注册开发者应用。"
+                                       Style="{StaticResource CaptionStyle}"
+                                       Margin="0,5,0,0"
+                                       TextWrapping="Wrap"
+                                       LineHeight="18" />
+                            <Border Style="{StaticResource DividerStyle}" Margin="0,14,0,12" />
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="intervals.icu" FontSize="12"
+                                               FontWeight="SemiBold" />
+                                    <TextBlock Text="Settings → API Key"
+                                               Style="{StaticResource CaptionStyle}" Margin="0,3,0,0" />
+                                </StackPanel>
+                                <ui:Button Grid.Column="1" Content="打开设置"
+                                           Command="{Binding OpenIntervalsSettingsCommand}"
+                                           Style="{StaticResource GhostButtonStyle}" />
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Ride with GPS" FontSize="12"
+                                               FontWeight="SemiBold" />
+                                    <TextBlock Text="API clients → API Key + Auth Token"
+                                               Style="{StaticResource CaptionStyle}" Margin="0,3,0,0" />
+                                </StackPanel>
+                                <ui:Button Grid.Column="1" Content="打开设置"
+                                           Command="{Binding OpenRideWithGpsApiCommand}"
+                                           Style="{StaticResource GhostButtonStyle}" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Updates -->
+                    <Border Style="{StaticResource CardStyle}" Padding="22" Margin="0,14,0,0">
+                        <StackPanel>
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="34" Height="34" CornerRadius="10"
+                                            Background="#1A4C8DFF">
+                                        <ui:SymbolIcon Symbol="ArrowSync24" FontSize="18"
+                                                       Foreground="#FF8BB8FF"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock Text="软件更新" FontSize="14"
+                                                   FontWeight="SemiBold" />
+                                        <TextBlock Text="{Binding CurrentVersionText}"
+                                                   Style="{StaticResource CaptionStyle}"
+                                                   Margin="0,2,0,0" />
+                                    </StackPanel>
+                                </StackPanel>
+                                <Border Style="{StaticResource PillStyle}" HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibility}}">
+                                    <TextBlock Text="{Binding LatestVersionText}" FontSize="9.5"
+                                               Foreground="#FF8BB8FF" />
+                                </Border>
+                            </Grid>
+
+                            <TextBlock Text="{Binding UpdateStatus}"
+                                       Style="{StaticResource CaptionStyle}"
+                                       Margin="0,13,0,0"
+                                       TextWrapping="Wrap"
+                                       LineHeight="18" />
+
+                            <TextBlock Text="{Binding UpdateNotes}"
+                                       FontSize="10.5"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       Margin="0,8,0,0"
+                                       TextWrapping="Wrap"
+                                       LineHeight="16"
+                                       MaxHeight="84"
+                                       Visibility="{Binding UpdateNotes, Converter={StaticResource StringToVisibility}}" />
+
+                            <ProgressBar Value="{Binding UpdateProgress}"
+                                         Maximum="100"
+                                         Height="4"
+                                         Margin="0,10,0,0"
+                                         Foreground="{StaticResource AccentBrush}"
+                                         Background="#1AFFFFFF"
+                                         BorderThickness="0"
+                                         Visibility="{Binding IsInstallingUpdate, Converter={StaticResource BoolToVisibility}}" />
+                            <TextBlock Text="{Binding UpdateProgressText}"
+                                       FontSize="10"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       Margin="0,4,0,0"
+                                       Visibility="{Binding IsInstallingUpdate, Converter={StaticResource BoolToVisibility}}" />
+
+                            <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                <ui:Button Content="检查更新"
+                                           Icon="{ui:SymbolIcon Symbol=ArrowSync24}"
+                                           Command="{Binding CheckUpdatesCommand}"
+                                           Style="{StaticResource SecondaryButtonStyle}"
+                                           IsEnabled="{Binding IsCheckingUpdate, Converter={StaticResource InverseBool}}" />
+                                <ui:Button Content="下载并安装"
+                                           Icon="{ui:SymbolIcon Symbol=ArrowDownload24}"
+                                           Command="{Binding InstallUpdateCommand}"
+                                           Style="{StaticResource PrimaryButtonStyle}"
+                                           Margin="6,0,0,0"
+                                           Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibility}}"
+                                           IsEnabled="{Binding CanInstallUpdate}" />
+                                <ui:Button Content="打开发布页"
+                                           Command="{Binding OpenReleasePageCommand}"
+                                           Style="{StaticResource GhostButtonStyle}"
+                                           Margin="4,0,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- About -->
+                    <Border Style="{StaticResource CardStyle}" Padding="22" Margin="0,14,0,0">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Border Width="34" Height="34" CornerRadius="10"
+                                        Background="{StaticResource AccentGradientBrush}">
+                                    <ui:SymbolIcon Symbol="VehicleBicycle24" FontSize="18"
+                                                   Foreground="White"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                </Border>
+                                <StackPanel Margin="10,0,0,0">
+                                    <TextBlock Text="骑迹同步 BikeSync" FontSize="13"
+                                               FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding AppVersion}"
+                                               Style="{StaticResource CaptionStyle}" Margin="0,2,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+                            <TextBlock Text="WPF + WPF-UI 桌面应用。数据只在你选择的平台之间流转。"
+                                       Style="{StaticResource CaptionStyle}"
+                                       Margin="0,12,0,0"
+                                       TextWrapping="Wrap"
+                                       LineHeight="17" />
+                            <TextBlock Text="{Binding StatusText}"
+                                       FontSize="10.5"
+                                       Foreground="{StaticResource SuccessBrush}"
+                                       Margin="0,8,0,0"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

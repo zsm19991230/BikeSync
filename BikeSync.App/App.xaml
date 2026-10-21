@@ -1,0 +1,43 @@
+<Application x:Class="BikeSync.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:converters="clr-namespace:BikeSync.App.Converters"
+             xmlns:viewModels="clr-namespace:BikeSync.App.ViewModels"
+             xmlns:views="clr-namespace:BikeSync.App.Views"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemesDictionary Theme="Dark" />
+                <ui:ControlsDictionary />
+                <ResourceDictionary Source="Themes/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+            <converters:InverseBoolConverter x:Key="InverseBool" />
+            <converters:NullToVisibilityConverter x:Key="NullToVisibility" />
+            <converters:StringToVisibilityConverter x:Key="StringToVisibility" />
+            <converters:CountToVisibilityConverter x:Key="CountToVisibility" />
+            <converters:HexToBrushConverter x:Key="HexToBrush" />
+            <converters:SyncStateBrushConverter x:Key="SyncStateBrush" />
+            <converters:SyncStateSymbolConverter x:Key="SyncStateSymbol" />
+
+            <DataTemplate DataType="{x:Type viewModels:DashboardViewModel}">
+                <views:DashboardPage />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:AccountsViewModel}">
+                <views:AccountsPage />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:ActivityLibraryViewModel}">
+                <views:ActivitiesPage />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:SyncViewModel}">
+                <views:SyncPage />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
+                <views:SettingsPage />
+            </DataTemplate>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

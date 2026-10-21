@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="BikeSync.App/BikeSync.App.csproj" />
+  <Project Path="BikeSync.Core/BikeSync.Core.csproj" />
+  <Project Path="BikeSync.Tests/BikeSync.Tests.csproj" />
+</Solution>
