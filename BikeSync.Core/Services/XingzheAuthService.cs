@@ -34,7 +34,7 @@ public sealed class XingzheAuthService
         };
         http.DefaultRequestHeaders.TryAddWithoutValidation(
             "User-Agent",
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) BikeSync/1.1");
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) BikeSync/1.2");
 
         using var pageResponse = await http.GetAsync(BaseUrl + "/user/login", cancellationToken)
             .ConfigureAwait(false);

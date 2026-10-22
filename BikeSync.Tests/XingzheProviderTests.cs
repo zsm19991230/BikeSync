@@ -32,6 +32,7 @@ public sealed class XingzheProviderTests
         var activity = Assert.Single(activities);
         Assert.Equal("123", activity.Id);
         Assert.Equal("Morning Ride", activity.Name);
+        Assert.Equal(205, activity.AveragePowerWatts);
 
         var file = await provider.DownloadActivityAsync(account, activity, CancellationToken.None);
         Assert.Equal(ActivityFileFormat.Fit, file.Format);
@@ -57,7 +58,7 @@ public sealed class XingzheProviderTests
             var body = path switch
             {
                 "/api/v1/pgworkout/" => """
-                    {"code":0,"data":{"data":[{"id":123,"title":"Morning Ride","start_time":1761000000000,"sport":3,"distance":10000,"duration":1800,"avg_speed":20}]}}
+                    {"code":0,"data":{"data":[{"id":123,"title":"Morning Ride","start_time":1761000000000,"sport":3,"distance":10000,"duration":1800,"avg_speed":20,"avg_power":205}]}}
                     """,
                 "/api/v1/pgworkout/123/" => """
                     {"code":0,"data":{"workout":{"id":123,"title":"Morning Ride","start_time":1761000000000,"end_time":1761001800000,"sport":3,"distance":10000,"duration":1800}}}

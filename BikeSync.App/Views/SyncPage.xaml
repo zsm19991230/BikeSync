@@ -74,7 +74,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Background="#08FFFFFF"
-                                            BorderBrush="{StaticResource BorderSoftBrush}"
+                                            BorderBrush="{DynamicResource BorderSoftBrush}"
                                             BorderThickness="0,0,0,1"
                                             Padding="4,11">
                                         <Grid>
@@ -153,15 +153,15 @@
                     </Grid>
 
                     <Border Grid.Row="3"
-                            Background="#10FF6B2C"
-                            BorderBrush="#22FF6B2C"
+                            Background="{DynamicResource AccentTintBrush}"
+                            BorderBrush="{DynamicResource AccentBorderBrush}"
                             BorderThickness="1"
                             CornerRadius="10"
                             Padding="12,9"
                             Margin="0,12,0,0">
                         <StackPanel Orientation="Horizontal">
                             <ui:SymbolIcon Symbol="Info24" FontSize="14"
-                                           Foreground="{StaticResource AccentBrush}"
+                                           Foreground="{DynamicResource AccentBrush}"
                                            VerticalAlignment="Top" />
                             <TextBlock Text="MyWhoosh 的原始 FIT 会补正时间并尽量补充 NP/IF/TSS；Strava 源活动由数据流生成 TCX，其他平台优先使用原始文件。"
                                        Margin="8,0,0,0"
@@ -269,7 +269,7 @@
                                      Maximum="100"
                                      Height="5"
                                      Margin="0,8,0,0"
-                                     Foreground="{StaticResource AccentBrush}"
+                                     Foreground="{DynamicResource AccentBrush}"
                                      Background="#1AFFFFFF"
                                      BorderThickness="0" />
 

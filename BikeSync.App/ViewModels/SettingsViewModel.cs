@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -18,20 +19,42 @@ public sealed partial class SettingsViewModel : ObservableObject, IPageAware
     private readonly AppPaths _paths;
     private readonly NotificationService _notifications;
     private readonly UpdateService _updates;
+    private readonly ThemeService _themeService;
     private UpdateInfo? _availableUpdate;
+    private string _selectedThemeId = "ember";
+    private bool _suppressThemeApply;
 
     public SettingsViewModel(
         AppSession session,
         AppPaths paths,
         NotificationService notifications,
-        UpdateService updates)
+        UpdateService updates,
+        ThemeService themeService)
     {
         _session = session;
         _paths = paths;
         _notifications = notifications;
         _updates = updates;
+        _themeService = themeService;
+
+        Themes = new ObservableCollection<ThemeOptionViewModel>(
+            themeService.Available.Select(palette => new ThemeOptionViewModel
+            {
+                Id = palette.Id,
+                Name = palette.Name,
+                Description = palette.Description,
+                AccentHex = palette.AccentHex,
+                BackgroundHex = palette.BackgroundHex,
+                IsSelected = palette.Id == themeService.CurrentId,
+            }));
+
         LoadFromSettings();
     }
+
+    public ObservableCollection<ThemeOptionViewModel> Themes { get; }
+
+    [ObservableProperty]
+    private ThemeOptionViewModel? _selectedTheme;
 
     [ObservableProperty]
     private string _stravaClientId = string.Empty;
@@ -109,6 +132,28 @@ public sealed partial class SettingsViewModel : ObservableObject, IPageAware
         OnPropertyChanged(nameof(StravaConfigStatus));
     }
 
+    partial void OnSelectedThemeChanged(ThemeOptionViewModel? value)
+    {
+        if (value is null)
+        {
+            return;
+        }
+
+        foreach (var theme in Themes)
+        {
+            theme.IsSelected = theme.Id == value.Id;
+        }
+
+        if (_suppressThemeApply)
+        {
+            return;
+        }
+
+        _selectedThemeId = value.Id;
+        _themeService.Apply(value.Id);
+        _ = PersistThemeAsync(value);
+    }
+
     public Task OnNavigatedToAsync()
     {
         LoadFromSettings();
@@ -122,6 +167,16 @@ public sealed partial class SettingsViewModel : ObservableObject, IPageAware
         StravaClientSecret = settings.Strava.ClientSecret;
         DownloadDirectory = settings.DownloadDirectory;
         SaveActivityCopies = settings.SaveActivityCopies;
+
+        _selectedThemeId = ThemeService.Normalize(settings.Theme);
+        _suppressThemeApply = true;
+        SelectedTheme = Themes.FirstOrDefault(theme => theme.Id == _selectedThemeId);
+        foreach (var theme in Themes)
+        {
+            theme.IsSelected = theme.Id == _selectedThemeId;
+        }
+
+        _suppressThemeApply = false;
         StatusText = string.Empty;
     }
 
@@ -144,12 +199,11 @@ public sealed partial class SettingsViewModel : ObservableObject, IPageAware
         try
         {
             Directory.CreateDirectory(DownloadDirectory);
-            var current = _session.Settings.Current;
             var settings = new AppSettings
             {
                 DownloadDirectory = DownloadDirectory.Trim(),
                 SaveActivityCopies = SaveActivityCopies,
-                Theme = current.Theme,
+                Theme = _selectedThemeId,
                 Strava = new StravaAppSettings
                 {
                     ClientId = StravaClientId.Trim(),
@@ -170,6 +224,28 @@ public sealed partial class SettingsViewModel : ObservableObject, IPageAware
         finally
         {
             IsSaving = false;
+        }
+    }
+
+    private async Task PersistThemeAsync(ThemeOptionViewModel theme)
+    {
+        try
+        {
+            var current = _session.Settings.Current;
+            var settings = new AppSettings
+            {
+                DownloadDirectory = current.DownloadDirectory,
+                SaveActivityCopies = current.SaveActivityCopies,
+                Theme = theme.Id,
+                Strava = current.Strava,
+            };
+
+            await _session.Settings.SaveAsync(settings);
+            StatusText = $"已切换为「{theme.Name}」主题。";
+        }
+        catch (Exception ex)
+        {
+            _notifications.Error("保存主题设置失败：" + ex.Message);
         }
     }
 

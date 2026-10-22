@@ -1,12 +1,10 @@
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Threading;
 using BikeSync.App.Services;
 using BikeSync.App.ViewModels;
 using BikeSync.App.Views;
 using BikeSync.Core.Services;
 using Microsoft.Extensions.Logging;
-using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
 namespace BikeSync.App;
@@ -44,13 +42,6 @@ public partial class App : Application
 
         try
         {
-            ApplicationThemeManager.Apply(ApplicationTheme.Dark, WindowBackdropType.Mica, false);
-            ApplicationAccentColorManager.Apply(
-                Color.FromRgb(0xFF, 0x6B, 0x2C),
-                ApplicationTheme.Dark,
-                false,
-                false);
-
             _host = new AppHost();
             _logger = _host.GetRequiredService<ILogger<App>>();
 
@@ -59,6 +50,8 @@ public partial class App : Application
 
             var settings = _host.GetRequiredService<AppSettingsService>();
             await settings.LoadAsync();
+
+            _host.GetRequiredService<ThemeService>().Apply(settings.Current.Theme);
 
             var accounts = _host.GetRequiredService<AccountService>();
             await accounts.InitializeAsync();

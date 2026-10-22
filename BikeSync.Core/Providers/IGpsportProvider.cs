@@ -89,6 +89,7 @@ public sealed class IGpsportProvider : IPlatformProvider
                     MovingTimeSeconds = ParseDuration(ReadValue(row, "recordTime")),
                     ElapsedTimeSeconds = ParseDuration(ReadValue(row, "recordTime")),
                     ElevationGainMeters = Math.Max(0, ReadDouble(row, "totalAscent")),
+                    AveragePowerWatts = HttpApi.ReadAveragePower(row),
                     HasGps = true,
                     SourceFileType = "FIT",
                     WebUrl = "https://app.igpsport.cn",

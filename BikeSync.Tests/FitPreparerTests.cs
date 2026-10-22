@@ -1,5 +1,7 @@
 using System.Buffers.Binary;
+using BikeSync.Core.Models;
 using BikeSync.Core.Providers;
+using BikeSync.Core.Services;
 
 namespace BikeSync.Tests;
 
@@ -12,10 +14,23 @@ public sealed class FitPreparerTests
 
         var prepared = FitPreparer.Prepare(raw, TimeZoneInfo.Utc, 250);
 
-        FitPreparer.Validate(prepared.Content, BikeSync.Core.Models.PlatformId.IGpsport);
+        FitPreparer.Validate(prepared.Content, PlatformId.IGpsport);
         Assert.True(prepared.MetricsCalculated);
         Assert.Contains("NP=200", prepared.Summary);
         Assert.True(prepared.Content.Length > raw.Length);
+    }
+
+    [Fact]
+    public void ActivityTrackReader_reads_fit_records()
+    {
+        var raw = Fixture(new ulong[] { 100, 200, 300 }, 3);
+
+        var track = ActivityTrackReader.Read(raw, ActivityFileFormat.Fit, DateTimeOffset.UtcNow);
+
+        Assert.Equal(3, track.Points.Count);
+        Assert.Equal(3, track.GpsPointCount);
+        Assert.Equal(200d, track.AveragePowerWatts);
+        Assert.Equal(300d, track.MaxPowerWatts);
     }
 
     private static byte[] Fixture(ulong[] powers, ulong duration)

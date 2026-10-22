@@ -14,16 +14,7 @@ public sealed record AccountOption(
     string AuthLabel,
     string BrandColor)
 {
-    public string Initial => Platform switch
-    {
-        PlatformId.Strava => "S",
-        PlatformId.IntervalsIcu => "i",
-        PlatformId.RideWithGps => "R",
-        PlatformId.MyWhoosh => "M",
-        PlatformId.IGpsport => "I",
-        PlatformId.Xingzhe => "X",
-        _ => "?",
-    };
+    public string Initial => PlatformCatalog.Initial(Platform);
 
     public string Label => $"{DisplayName} · {PlatformName}";
 }

@@ -88,7 +88,7 @@ dotnet publish BikeSync.App/BikeSync.App.csproj `
 
 ## 软件更新
 
-当前版本：**v1.1.0**。
+当前版本：**v1.2.0**。
 
 1. 打开「设置」→「软件更新」。
 2. 点击「检查更新」，应用会读取 GitHub Releases 的最新版本。

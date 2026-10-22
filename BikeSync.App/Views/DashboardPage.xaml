@@ -8,7 +8,7 @@
              d:DesignWidth="1080">
     <ScrollViewer VerticalScrollBarVisibility="Auto"
                   HorizontalScrollBarVisibility="Disabled">
-        <Grid Margin="0,0,0,8">
+        <Grid Margin="0,0,10,8">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -45,7 +45,7 @@
             <!-- Hero -->
             <Border Grid.Row="1"
                     Style="{StaticResource CardStyle}"
-                    Background="{StaticResource HeroGradientBrush}"
+                    Background="{DynamicResource HeroGradientBrush}"
                     Padding="30"
                     MinHeight="212">
                 <Grid>
@@ -56,15 +56,15 @@
 
                     <StackPanel VerticalAlignment="Center">
                         <Border HorizontalAlignment="Left"
-                                Background="#1FFF6B2C"
-                                BorderBrush="#44FF6B2C"
+                                Background="{DynamicResource AccentTintBrush}"
+                                BorderBrush="{DynamicResource AccentBorderBrush}"
                                 BorderThickness="1"
                                 CornerRadius="999"
                                 Padding="9,4">
                             <TextBlock Text="跨平台骑行数据流转"
                                        FontSize="10.5"
                                        FontWeight="SemiBold"
-                                       Foreground="#FFFFB38F" />
+                                       Foreground="{DynamicResource AccentTextBrush}" />
                         </Border>
                         <TextBlock Text="你的骑行，不该被平台困住。"
                                    FontFamily="{StaticResource DisplayFontFamily}"
@@ -93,20 +93,20 @@
 
                     <Grid Grid.Column="1" IsHitTestVisible="False">
                         <Ellipse Width="190" Height="190"
-                                 Stroke="#22FF6B2C"
+                                 Stroke="{DynamicResource AccentBorderBrush}"
                                  StrokeThickness="1"
                                  HorizontalAlignment="Right"
                                  VerticalAlignment="Center"
                                  Margin="0,0,48,0" />
                         <Ellipse Width="132" Height="132"
-                                 Stroke="#33FF6B2C"
+                                 Stroke="{DynamicResource AccentBorderBrush}"
                                  StrokeThickness="1"
                                  HorizontalAlignment="Right"
                                  VerticalAlignment="Center"
                                  Margin="0,0,77,0" />
                         <Border Width="140" Height="140"
                                 CornerRadius="70"
-                                Background="#18FF6B2C"
+                                Background="{DynamicResource AccentTintBrush}"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Center"
                                 Margin="0,0,73,0" />
@@ -126,7 +126,7 @@
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <ui:SymbolIcon Symbol="PlugConnected24" FontSize="16"
-                                           Foreground="{StaticResource AccentBrush}" />
+                                           Foreground="{DynamicResource AccentBrush}" />
                             <TextBlock Text="已连接平台" Margin="8,0,0,0"
                                        FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
                         </StackPanel>

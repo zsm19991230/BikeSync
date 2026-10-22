@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO.Compression;
 using System.Net;
 using System.Net.Http.Headers;
@@ -13,6 +14,102 @@ internal static class HttpApi
     {
         PropertyNameCaseInsensitive = true,
     };
+
+    // Activity list payloads from the unofficial clients do not share a single
+    // schema; try the common names before falling back to a shallow nested search.
+    private static readonly string[] AveragePowerKeys =
+    {
+        "avgPower", "averagePower", "avgPowerWatts", "averagePowerWatts",
+        "avg_watts", "average_watts", "icu_average_watts",
+        "avg_power", "average_power", "avgWatts", "averageWatts",
+    };
+
+    private static readonly string[] LoosePowerKeys = { "power", "watts" };
+
+    /// <summary>
+    /// Reads an average power value from a platform summary payload. Returns null
+    /// when the payload only exposes unrelated power fields or no power data.
+    /// </summary>
+    public static double? ReadAveragePower(JsonElement element, int depth = 0)
+    {
+        if (element.ValueKind != JsonValueKind.Object || depth > 2)
+        {
+            return null;
+        }
+
+        foreach (var key in AveragePowerKeys)
+        {
+            if (TryGetProperty(element, key, out var value) && TryReadNumber(value, out var number))
+            {
+                return number;
+            }
+        }
+
+        if (depth == 0)
+        {
+            foreach (var key in LoosePowerKeys)
+            {
+                if (TryGetProperty(element, key, out var value) && TryReadNumber(value, out var number))
+                {
+                    return number;
+                }
+            }
+        }
+
+        foreach (var property in element.EnumerateObject())
+        {
+            if (property.Value.ValueKind != JsonValueKind.Object)
+            {
+                continue;
+            }
+
+            var nested = ReadAveragePower(property.Value, depth + 1);
+            if (nested is not null)
+            {
+                return nested;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool TryGetProperty(JsonElement element, string name, out JsonElement value)
+    {
+        foreach (var property in element.EnumerateObject())
+        {
+            if (string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))
+            {
+                value = property.Value;
+                return true;
+            }
+        }
+
+        value = default;
+        return false;
+    }
+
+    private static bool TryReadNumber(JsonElement value, out double number)
+    {
+        number = 0;
+        if (value.ValueKind == JsonValueKind.Number)
+        {
+            if (!value.TryGetDouble(out number))
+            {
+                return false;
+            }
+        }
+        else if (value.ValueKind != JsonValueKind.String ||
+                 !double.TryParse(
+                     value.GetString(),
+                     NumberStyles.Float,
+                     CultureInfo.InvariantCulture,
+                     out number))
+        {
+            return false;
+        }
+
+        return double.IsFinite(number) && number > 0;
+    }
 
     public static StringContent JsonContent<T>(T value) =>
         new(JsonSerializer.Serialize(value), System.Text.Encoding.UTF8, "application/json");

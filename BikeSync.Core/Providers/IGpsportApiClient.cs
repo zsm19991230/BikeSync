@@ -86,7 +86,7 @@ internal sealed class IGpsportApiClient
         }
 
         using var request = new HttpRequestMessage(HttpMethod.Get, uri);
-        request.Headers.TryAddWithoutValidation("User-Agent", "BikeSync/1.1 (Windows; iGPSPORT web)");
+        request.Headers.TryAddWithoutValidation("User-Agent", "BikeSync/1.2 (Windows; iGPSPORT web)");
         using var response = await _http.SendAsync(request, cancellationToken).ConfigureAwait(false);
         return await HttpApi.ReadBytesAsync(response, PlatformId.IGpsport, cancellationToken)
             .ConfigureAwait(false);
@@ -242,7 +242,7 @@ internal sealed class IGpsportApiClient
             using var request = new HttpRequestMessage(method, BaseUrl + path);
             request.Headers.TryAddWithoutValidation("Origin", Origin);
             request.Headers.TryAddWithoutValidation("Referer", Origin + "/");
-            request.Headers.TryAddWithoutValidation("User-Agent", "BikeSync/1.1 (Windows; iGPSPORT web)");
+            request.Headers.TryAddWithoutValidation("User-Agent", "BikeSync/1.2 (Windows; iGPSPORT web)");
             request.Headers.TryAddWithoutValidation("Accept-Language", "zh-Hans");
             request.Headers.TryAddWithoutValidation("TimeZone", ResolveTimeZone());
             request.Headers.TryAddWithoutValidation("Qiwu-App-Version", "8.07.08");
@@ -331,7 +331,7 @@ internal sealed class IGpsportApiClient
             HttpMethod.Get,
             BaseUrl + "/service/edge-core/api/public/key");
         request.Headers.TryAddWithoutValidation("Origin", Origin);
-        request.Headers.TryAddWithoutValidation("User-Agent", "BikeSync/1.1 (Windows; iGPSPORT web)");
+        request.Headers.TryAddWithoutValidation("User-Agent", "BikeSync/1.2 (Windows; iGPSPORT web)");
         request.Headers.TryAddWithoutValidation("X-Platform", "web");
         using var response = await _http.SendAsync(request, cancellationToken).ConfigureAwait(false);
         using var document = await HttpApi.ReadJsonAsync(response, PlatformId.IGpsport, cancellationToken)
@@ -354,7 +354,7 @@ internal sealed class IGpsportApiClient
                     HttpMethod.Get,
                     BaseUrl + "/service/edge-core/api/public/timestamp");
                 timestampRequest.Headers.TryAddWithoutValidation("Origin", Origin);
-                timestampRequest.Headers.TryAddWithoutValidation("User-Agent", "BikeSync/1.1 (Windows; iGPSPORT web)");
+                timestampRequest.Headers.TryAddWithoutValidation("User-Agent", "BikeSync/1.2 (Windows; iGPSPORT web)");
                 timestampRequest.Headers.TryAddWithoutValidation("X-Platform", "web");
                 using var timestampResponse = await _http.SendAsync(timestampRequest, cancellationToken)
                     .ConfigureAwait(false);

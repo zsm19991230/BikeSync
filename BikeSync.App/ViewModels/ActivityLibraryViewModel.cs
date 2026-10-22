@@ -18,19 +18,26 @@ public sealed partial class ActivityLibraryViewModel : ObservableObject, IPageAw
     private readonly NavigationService _navigation;
     private readonly NotificationService _notifications;
     private readonly ActivityCacheService _cache;
+    private readonly ActivityDetailService _detailService;
+    private readonly MapTileService _mapTiles;
     private string _accountSignature = string.Empty;
     private bool _suppressSourceReset;
+    private CancellationTokenSource? _detailCts;
 
     public ActivityLibraryViewModel(
         AppSession session,
         NavigationService navigation,
         NotificationService notifications,
-        ActivityCacheService cache)
+        ActivityCacheService cache,
+        ActivityDetailService detailService,
+        MapTileService mapTiles)
     {
         _session = session;
         _navigation = navigation;
         _notifications = notifications;
         _cache = cache;
+        _detailService = detailService;
+        _mapTiles = mapTiles;
         _session.Changed += (_, _) => RebuildSources();
 
         DateRanges = new[]
@@ -96,6 +103,14 @@ public sealed partial class ActivityLibraryViewModel : ObservableObject, IPageAw
     [ObservableProperty]
     private bool _areAllSelected;
 
+    [ObservableProperty]
+    private ActivityDetailViewModel? _detail;
+
+    public bool HasDetail => Detail is not null;
+
+    partial void OnDetailChanged(ActivityDetailViewModel? value) =>
+        OnPropertyChanged(nameof(HasDetail));
+
     public bool IsCustomRange => SelectedRange?.Preset == DateRangePreset.Custom;
     public bool HasRows => Rows.Count > 0;
     public bool IsEmpty => HasLoaded && Rows.Count == 0;
@@ -121,6 +136,7 @@ public sealed partial class ActivityLibraryViewModel : ObservableObject, IPageAw
             return;
         }
 
+        CloseDetail();
         Rows.Clear();
         ActivitiesView.Refresh();
         HasLoaded = false;
@@ -490,6 +506,68 @@ public sealed partial class ActivityLibraryViewModel : ObservableObject, IPageAw
 
     [RelayCommand]
     private void OpenAccounts() => _navigation.Navigate(AppPage.Accounts);
+
+    [RelayCommand]
+    private async Task OpenDetailAsync(ActivityRowViewModel? row)
+    {
+        if (row is null || SelectedSource is null)
+        {
+            return;
+        }
+
+        var accountId = SelectedSource.Id;
+        CloseDetail();
+        var cts = new CancellationTokenSource();
+        _detailCts = cts;
+
+        var detail = new ActivityDetailViewModel(_detailService, _mapTiles);
+        Detail = detail;
+        try
+        {
+            var account = await _session.SyncService.GetFreshAccountAsync(accountId, cts.Token)
+                .ConfigureAwait(true);
+            await detail.LoadAsync(account, row.Activity, cts.Token).ConfigureAwait(true);
+        }
+        catch (OperationCanceledException)
+        {
+            // The detail panel was closed or another activity was opened.
+        }
+        catch (Exception ex)
+        {
+            detail.ShowError("无法打开活动详情：" + ex.Message);
+        }
+        finally
+        {
+            if (ReferenceEquals(_detailCts, cts))
+            {
+                _detailCts = null;
+            }
+
+            cts.Dispose();
+        }
+    }
+
+    [RelayCommand]
+    private void CloseDetail()
+    {
+        var cts = _detailCts;
+        _detailCts = null;
+        if (cts is not null)
+        {
+            try
+            {
+                cts.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Already finished.
+            }
+
+            cts.Dispose();
+        }
+
+        Detail = null;
+    }
 
     [RelayCommand]
     private void OpenSync()

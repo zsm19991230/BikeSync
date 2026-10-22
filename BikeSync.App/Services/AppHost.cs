@@ -34,6 +34,9 @@ public sealed class AppHost : IDisposable
         services.AddSingleton<IGpsportAuthService>();
         services.AddSingleton<XingzheAuthService>();
         services.AddSingleton<ActivityCacheService>();
+        services.AddSingleton<ActivityFileCacheService>();
+        services.AddSingleton<ActivityDetailService>();
+        services.AddSingleton<MapTileService>();
         services.AddSingleton<UpdateService>();
         services.AddSingleton<ConnectionService>();
         services.AddSingleton<IProviderRegistry, ProviderRegistry>();
@@ -58,7 +61,7 @@ public sealed class AppHost : IDisposable
             {
                 Timeout = TimeSpan.FromSeconds(100),
             };
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("BikeSync/1.1 (Windows; cycling data sync)");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("BikeSync/1.2 (Windows; cycling data sync)");
             return client;
         });
 
@@ -71,6 +74,7 @@ public sealed class AppHost : IDisposable
 
         services.AddSingleton<NotificationService>();
         services.AddSingleton<NavigationService>();
+        services.AddSingleton<ThemeService>();
         services.AddSingleton<DashboardViewModel>();
         services.AddSingleton<AccountsViewModel>();
         services.AddSingleton<ActivityLibraryViewModel>();

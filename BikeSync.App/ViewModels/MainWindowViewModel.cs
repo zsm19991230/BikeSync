@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using BikeSync.App.Services;
+using BikeSync.Core.Updates;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Wpf.Ui.Controls;
@@ -17,6 +18,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private readonly AppSession _session;
     private readonly NavigationService _navigation;
     private readonly NotificationService _notifications;
+    private readonly UpdateService _updates;
     private bool _suppressNavigation;
     private CancellationTokenSource? _toastCts;
 
@@ -28,7 +30,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
         SettingsViewModel settings,
         AppSession session,
         NavigationService navigation,
-        NotificationService notifications)
+        NotificationService notifications,
+        UpdateService updates)
     {
         _dashboard = dashboard;
         _accounts = accounts;
@@ -38,6 +41,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         _session = session;
         _navigation = navigation;
         _notifications = notifications;
+        _updates = updates;
 
         NavigationItems = new ObservableCollection<NavigationItem>
         {
@@ -89,8 +93,29 @@ public sealed partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private SymbolRegular _toastSymbol = SymbolRegular.Info24;
 
+    [ObservableProperty]
+    private bool _isSidebarExpanded = true;
+
+    public double SidebarWidth => IsSidebarExpanded ? 250 : 0;
+    public SymbolRegular SidebarToggleSymbol => IsSidebarExpanded
+        ? SymbolRegular.PanelLeftContract24
+        : SymbolRegular.PanelLeftExpand24;
+    public string SidebarToggleText => IsSidebarExpanded ? "收起侧边栏" : "展开侧边栏";
+
+    partial void OnIsSidebarExpandedChanged(bool value)
+    {
+        OnPropertyChanged(nameof(SidebarWidth));
+        OnPropertyChanged(nameof(SidebarToggleSymbol));
+        OnPropertyChanged(nameof(SidebarToggleText));
+    }
+
+    [RelayCommand]
+    private void ToggleSidebar() => IsSidebarExpanded = !IsSidebarExpanded;
+
     public string CurrentDateText => DateTime.Now.ToString("yyyy年M月d日",
         System.Globalization.CultureInfo.GetCultureInfo("zh-CN"));
+
+    public string VersionText => $"{_updates.CurrentVersionText} · Windows Desktop";
 
     partial void OnSelectedNavigationItemChanged(NavigationItem? value)
     {

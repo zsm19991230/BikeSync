@@ -47,6 +47,7 @@ public sealed class MyWhooshProvider : IPlatformProvider
                 MovingTimeSeconds = row.DurationSeconds,
                 ElapsedTimeSeconds = row.DurationSeconds,
                 ElevationGainMeters = row.ElevationMeters,
+                AveragePowerWatts = row.AveragePowerWatts,
                 HasGps = false,
                 SourceFileType = "FIT",
                 WebUrl = "https://www.mywhoosh.com",

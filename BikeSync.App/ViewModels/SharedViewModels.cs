@@ -14,6 +14,18 @@ public sealed record NavigationItem(
 
 public sealed record DateRangeOption(string Label, DateRangePreset Preset);
 
+public sealed partial class ThemeOptionViewModel : ObservableObject
+{
+    public required string Id { get; init; }
+    public required string Name { get; init; }
+    public required string Description { get; init; }
+    public required string AccentHex { get; init; }
+    public required string BackgroundHex { get; init; }
+
+    [ObservableProperty]
+    private bool _isSelected;
+}
+
 public sealed class PlatformStatusViewModel
 {
     public required PlatformDescriptor Descriptor { get; init; }
@@ -99,13 +111,11 @@ public sealed partial class ActivityRowViewModel : ObservableObject
     public string DistanceText => DisplayFormat.Distance(Activity.DistanceMeters);
     public string DurationText => DisplayFormat.Duration(Activity.MovingTime);
     public string ElevationText => DisplayFormat.Elevation(Activity.ElevationGainMeters);
-    public string PowerText => Activity.AveragePowerWatts is { } power
-        ? $"{power:0} W"
-        : "—";
     public string HeartRateText => Activity.AverageHeartRate is { } hr ? $"{hr} bpm" : "—";
     public string SourceText => Activity.AccountName;
     public string PlatformColor => PlatformCatalog.Get(Activity.Platform).BrandColor;
     public string PlatformShort => PlatformCatalog.Get(Activity.Platform).ShortName;
+    public string PlatformInitial => PlatformCatalog.Initial(Activity.Platform);
 }
 
 public enum SyncRowState

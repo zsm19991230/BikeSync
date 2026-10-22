@@ -13,7 +13,7 @@
                  ExtendsContentIntoTitleBar="True"
                  WindowBackdropType="None"
                  WindowCornerPreference="Round"
-                 Background="{StaticResource AppBackgroundBrush}"
+                 Background="{DynamicResource AppBackgroundBrush}"
                  FontFamily="{StaticResource AppFontFamily}"
                  Foreground="{StaticResource TextPrimaryBrush}"
                  UseLayoutRounding="True"
@@ -28,24 +28,46 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
+        <Grid Grid.Row="0">
+            <Border Background="{DynamicResource AppBackgroundBrush}" />
+            <Border Width="{Binding SidebarWidth}"
+                    HorizontalAlignment="Left"
+                    Background="{DynamicResource SidebarBrush}"
+                    BorderBrush="{DynamicResource BorderSoftBrush}"
+                    BorderThickness="0,0,1,0"
+                    Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVisibility}}" />
+        </Grid>
+
         <ui:TitleBar Grid.Row="0"
                      Title=" "
-                     Background="{StaticResource AppBackgroundBrush}"
+                     Background="Transparent"
                      ShowMinimize="True"
                      ShowMaximize="True"
                      ShowClose="True"
-                     Height="44" />
+                     Height="44">
+            <ui:TitleBar.Header>
+                <ui:Button Width="34" Height="30"
+                           Padding="0"
+                           Appearance="Transparent"
+                           ToolTip="{Binding SidebarToggleText}"
+                           Command="{Binding ToggleSidebarCommand}">
+                    <ui:SymbolIcon Symbol="{Binding SidebarToggleSymbol}" FontSize="16" />
+                </ui:Button>
+            </ui:TitleBar.Header>
+        </ui:TitleBar>
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
             <!-- Sidebar -->
             <Border Grid.Column="0"
-                    Background="{StaticResource SidebarBrush}"
-                    BorderBrush="{StaticResource BorderSoftBrush}"
+                    Width="{Binding SidebarWidth}"
+                    Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolToVisibility}}"
+                    Background="{DynamicResource SidebarBrush}"
+                    BorderBrush="{DynamicResource BorderSoftBrush}"
                     BorderThickness="0,0,1,0">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -54,16 +76,10 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <Border Height="150"
-                            VerticalAlignment="Top"
-                            Background="{StaticResource SidebarGlowBrush}"
-                            IsHitTestVisible="False"
-                            Opacity="0.75" />
-
                     <StackPanel Grid.Row="0" Margin="22,14,22,12">
                         <StackPanel Orientation="Horizontal">
                             <Border Width="44" Height="44" CornerRadius="12"
-                                    Background="{StaticResource AccentGradientBrush}">
+                                    Background="{DynamicResource AccentGradientBrush}">
                                 <ui:SymbolIcon Symbol="VehicleBicycle24"
                                                FontSize="25"
                                                Foreground="White"
@@ -126,8 +142,8 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="2" Margin="18,10,18,18">
-                        <Border Background="#FF0F1822"
-                                BorderBrush="{StaticResource BorderSoftBrush}"
+                        <Border Background="{DynamicResource SurfaceAltBrush}"
+                                BorderBrush="{DynamicResource BorderSoftBrush}"
                                 BorderThickness="1"
                                 CornerRadius="14"
                                 Padding="14">
@@ -157,7 +173,7 @@
                                            FontSize="11.5" />
                             </StackPanel>
                         </Border>
-                        <TextBlock Text="v1.0 · Windows Desktop"
+                        <TextBlock Text="{Binding VersionText}"
                                    Margin="2,12,0,0"
                                    FontSize="10"
                                    Foreground="{StaticResource TextMutedBrush}" />
@@ -168,7 +184,7 @@
             <!-- Content -->
             <Grid Grid.Column="1"
                   ClipToBounds="True"
-                  Background="{StaticResource AppBackgroundBrush}">
+                  Background="{DynamicResource AppBackgroundBrush}">
                 <ContentControl Content="{Binding CurrentPage}"
                                 HorizontalContentAlignment="Stretch"
                                 VerticalContentAlignment="Stretch"
@@ -182,7 +198,7 @@
                         Margin="0,0,30,26"
                         Width="380"
                         Background="#FA15202C"
-                        BorderBrush="{StaticResource BorderBrushCustom}"
+                        BorderBrush="{DynamicResource BorderBrushCustom}"
                         BorderThickness="1"
                         CornerRadius="14"
                         Padding="16,14">

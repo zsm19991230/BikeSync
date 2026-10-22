@@ -9,7 +9,7 @@
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
-            <StackPanel Margin="0,0,0,12">
+            <StackPanel Margin="0,0,10,12">
                 <Grid Margin="0,4,0,22">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -87,7 +87,7 @@
 
                                     <Border Grid.Row="2"
                                             Background="#0BFFFFFF"
-                                            BorderBrush="{StaticResource BorderSoftBrush}"
+                                            BorderBrush="{DynamicResource BorderSoftBrush}"
                                             BorderThickness="1"
                                             CornerRadius="10"
                                             Padding="12,10"
@@ -199,8 +199,8 @@
               Visibility="{Binding IsDialogOpen, Converter={StaticResource BoolToVisibility}}">
             <Border Width="540"
                     Style="{StaticResource CardStyle}"
-                    Background="#FF141E2A"
-                    BorderBrush="{StaticResource BorderBrushCustom}"
+                    Background="{DynamicResource SurfaceRaisedBrush}"
+                    BorderBrush="{DynamicResource BorderBrushCustom}"
                     Padding="26"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center">
@@ -234,20 +234,20 @@
                     </Grid>
 
                     <Border Grid.Row="1"
-                            Background="#12FF6B2C"
-                            BorderBrush="#33FF6B2C"
+                            Background="{DynamicResource AccentTintBrush}"
+                            BorderBrush="{DynamicResource AccentBorderBrush}"
                             BorderThickness="1"
                             CornerRadius="10"
                             Padding="12,10"
                             Margin="0,18,0,0">
                         <StackPanel Orientation="Horizontal">
                             <ui:SymbolIcon Symbol="Key24" FontSize="15"
-                                           Foreground="{StaticResource AccentBrush}"
+                                           Foreground="{DynamicResource AccentBrush}"
                                            VerticalAlignment="Top" />
                             <TextBlock Text="{Binding DialogAuthHint}"
                                        Margin="9,0,0,0"
                                        FontSize="11.5"
-                                       Foreground="#FFF0B99F"
+                                       Foreground="{DynamicResource AccentTextBrush}"
                                        TextWrapping="Wrap"
                                        LineHeight="18" />
                         </StackPanel>
@@ -306,7 +306,7 @@
                     <StackPanel Grid.Row="2"
                                 Visibility="{Binding IsStravaDialog, Converter={StaticResource BoolToVisibility}}"
                                 Margin="0,18,0,0">
-                        <Border Background="#0BFFFFFF" BorderBrush="{StaticResource BorderSoftBrush}"
+                        <Border Background="#0BFFFFFF" BorderBrush="{DynamicResource BorderSoftBrush}"
                                 BorderThickness="1" CornerRadius="10" Padding="13">
                             <StackPanel>
                                 <TextBlock Text="浏览器授权流程"
@@ -364,8 +364,8 @@
               Visibility="{Binding IsDisconnectOpen, Converter={StaticResource BoolToVisibility}}">
             <Border Width="430"
                     Style="{StaticResource CardStyle}"
-                    Background="#FF141E2A"
-                    BorderBrush="{StaticResource BorderBrushCustom}"
+                    Background="{DynamicResource SurfaceRaisedBrush}"
+                    BorderBrush="{DynamicResource BorderBrushCustom}"
                     Padding="24"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center">

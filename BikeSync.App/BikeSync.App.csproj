@@ -10,7 +10,7 @@
     <RootNamespace>BikeSync.App</RootNamespace>
     <Product>骑迹同步 BikeSync</Product>
     <AssemblyTitle>骑迹同步</AssemblyTitle>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <SatelliteResourceLanguages>zh-Hans;en</SatelliteResourceLanguages>

@@ -107,7 +107,7 @@ public sealed class XingzheProvider : IPlatformProvider
                     DistanceMeters = Math.Max(0, ReadDouble(row, "distance")),
                     MovingTimeSeconds = (int)Math.Max(0, ReadDouble(row, "duration")),
                     ElapsedTimeSeconds = (int)Math.Max(0, ReadDouble(row, "duration")),
-                    AveragePowerWatts = null,
+                    AveragePowerWatts = HttpApi.ReadAveragePower(row),
                     HasGps = !string.Equals(sport, "IndoorCycling", StringComparison.OrdinalIgnoreCase),
                     SourceFileType = "FIT",
                     WebUrl = BaseUrl,
@@ -339,7 +339,7 @@ public sealed class XingzheProvider : IPlatformProvider
         request.Headers.TryAddWithoutValidation("Referer", BaseUrl + "/");
         request.Headers.TryAddWithoutValidation(
             "User-Agent",
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) BikeSync/1.1");
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) BikeSync/1.2");
         using var response = await _http.SendAsync(request, cancellationToken).ConfigureAwait(false);
         var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)

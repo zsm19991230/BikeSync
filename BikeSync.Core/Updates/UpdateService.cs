@@ -47,7 +47,7 @@ public sealed class UpdateService
     }
 
     public Version CurrentVersion =>
-        Assembly.GetEntryAssembly()?.GetName().Version ?? new Version(1, 1, 0);
+        Assembly.GetEntryAssembly()?.GetName().Version ?? new Version(1, 2, 0);
 
     public string CurrentVersionText => "v" + CurrentVersion.ToString(3);
 
@@ -193,7 +193,7 @@ public sealed class UpdateService
             using var request = new HttpRequestMessage(
                 HttpMethod.Get,
                 $"https://api.github.com/repos/{GitHubOwner}/{GitHubRepo}/releases/latest");
-            request.Headers.TryAddWithoutValidation("User-Agent", "BikeSync/1.1");
+            request.Headers.TryAddWithoutValidation("User-Agent", "BikeSync/1.2");
             request.Headers.TryAddWithoutValidation("Accept", "application/vnd.github+json");
             using var response = await _http.SendAsync(request, cancellationToken).ConfigureAwait(false);
             if (response.StatusCode == HttpStatusCode.NotFound)
@@ -220,7 +220,7 @@ public sealed class UpdateService
             using var request = new HttpRequestMessage(
                 HttpMethod.Get,
                 $"https://gitee.com/api/v5/repos/{GiteeOwner}/{GiteeRepo}/releases/latest");
-            request.Headers.TryAddWithoutValidation("User-Agent", "BikeSync/1.1");
+            request.Headers.TryAddWithoutValidation("User-Agent", "BikeSync/1.2");
             using var response = await _http.SendAsync(request, cancellationToken).ConfigureAwait(false);
             if (response.StatusCode == HttpStatusCode.NotFound)
             {

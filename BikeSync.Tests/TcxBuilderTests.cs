@@ -46,6 +46,39 @@ public class TcxBuilderTests
     }
 
     [Fact]
+    public void ActivityTrackReader_roundtrips_generated_tcx()
+    {
+        var activity = new ActivitySummary
+        {
+            Id = "1",
+            Platform = PlatformId.Strava,
+            AccountId = Guid.NewGuid(),
+            AccountName = "tester",
+            Name = "Morning Ride",
+            StartTime = new DateTimeOffset(2026, 5, 1, 6, 0, 0, TimeSpan.Zero),
+            DistanceMeters = 2000,
+            ElapsedTimeSeconds = 3600,
+        };
+        var points = new[]
+        {
+            new TcxTrackPoint(
+                new DateTimeOffset(2026, 5, 1, 6, 0, 0, TimeSpan.Zero),
+                31.2, 121.4, 10, 0, 120, 80, 210),
+            new TcxTrackPoint(
+                new DateTimeOffset(2026, 5, 1, 6, 0, 10, TimeSpan.Zero),
+                31.201, 121.401, 12, 100, 125, 82, 230),
+        };
+
+        var bytes = TcxBuilder.Build(activity, points);
+        var track = ActivityTrackReader.Read(bytes, ActivityFileFormat.Tcx, activity.StartTime);
+
+        Assert.Equal(2, track.Points.Count);
+        Assert.Equal(2, track.GpsPointCount);
+        Assert.Equal(220d, track.AveragePowerWatts);
+        Assert.Equal(123, track.AverageHeartRate);
+    }
+
+    [Fact]
     public void Build_WithNoPoints_Throws()
     {
         var activity = new ActivitySummary

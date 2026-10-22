@@ -132,7 +132,7 @@
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock Text="{Binding StatusText}" FontSize="11.5"
                            Foreground="{StaticResource TextSecondaryBrush}" />
-                <Border Width="1" Height="12" Background="{StaticResource BorderBrushCustom}"
+                <Border Width="1" Height="12" Background="{DynamicResource BorderBrushCustom}"
                         Margin="11,0" />
                 <TextBlock FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}">
                     <Run Text="已选 " />
@@ -160,8 +160,10 @@
         <!-- Table -->
         <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="8,4,8,8">
             <Grid>
-                <ui:DataGrid ItemsSource="{Binding ActivitiesView}"
+                <ui:DataGrid x:Name="ActivityGrid"
+                             ItemsSource="{Binding ActivitiesView}"
                              Style="{StaticResource ActivityGridStyle}"
+                             MouseDoubleClick="OnActivityDoubleClick"
                              MinHeight="220">
                     <ui:DataGrid.Columns>
                         <DataGridTemplateColumn Width="44" CanUserSort="False">
@@ -183,14 +185,13 @@
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <Border Width="30" Height="30" CornerRadius="9"
+                                        <Border Width="32" Height="32" CornerRadius="10"
                                                 Background="{Binding PlatformColor, Converter={StaticResource HexToBrush}}"
-                                                Opacity="0.16"
                                                 VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding PlatformShort}"
-                                                       FontSize="8"
+                                            <TextBlock Text="{Binding PlatformInitial}"
+                                                       FontSize="14"
                                                        FontWeight="Bold"
-                                                       Foreground="{Binding PlatformColor, Converter={StaticResource HexToBrush}}"
+                                                       Foreground="White"
                                                        HorizontalAlignment="Center"
                                                        VerticalAlignment="Center" />
                                         </Border>
@@ -252,12 +253,19 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <DataGridTemplateColumn Header="均功率" Width="86" CanUserSort="False">
+                        <DataGridTemplateColumn Header="详情" Width="52" CanUserSort="False">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding PowerText}" FontSize="11.5"
-                                               Foreground="{StaticResource AccentBrush}"
-                                               VerticalAlignment="Center" />
+                                    <ui:Button Icon="{ui:SymbolIcon Symbol=ChevronRight24}"
+                                               Width="30" Height="30"
+                                               Padding="0"
+                                               Appearance="Transparent"
+                                               ToolTip="查看活动详情"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Command="{Binding DataContext.OpenDetailCommand,
+                                                         RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                               CommandParameter="{Binding}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -297,7 +305,7 @@
                       Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <ui:ProgressRing IsIndeterminate="True" Width="42" Height="42"
-                                         Foreground="{StaticResource AccentBrush}" />
+                                         Foreground="{DynamicResource AccentBrush}" />
                         <TextBlock Text="正在获取活动…" Margin="0,12,0,0"
                                    FontSize="12.5"
                                    Foreground="{StaticResource TextSecondaryBrush}" />
@@ -330,5 +338,305 @@
                 </StackPanel>
             </Grid>
         </Border>
+
+        <!-- Activity detail overlay -->
+        <Grid Grid.RowSpan="5"
+              Panel.ZIndex="20"
+              Visibility="{Binding HasDetail, Converter={StaticResource BoolToVisibility}}">
+            <Border Background="#C8050A11" />
+            <Border DataContext="{Binding Detail}"
+                    Margin="4,6"
+                    MaxWidth="1060"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Stretch"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrushCustom}"
+                    BorderThickness="1"
+                    CornerRadius="20">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="36" ShadowDepth="10" Opacity="0.45" Color="Black" />
+                </Border.Effect>
+                <Grid Margin="22">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <Grid Grid.Row="0" Margin="0,0,0,14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border Width="46" Height="46" CornerRadius="13"
+                                Background="{Binding PlatformColor, Converter={StaticResource HexToBrush}}">
+                            <TextBlock Text="{Binding PlatformInitial}"
+                                       FontSize="20"
+                                       FontWeight="Bold"
+                                       Foreground="White"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="13,0,12,0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Title}"
+                                       FontSize="21"
+                                       FontWeight="SemiBold"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{Binding Subtitle}"
+                                       FontSize="11.5"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       Margin="0,5,0,0"
+                                       TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                        <ui:Button Grid.Column="2"
+                                   Icon="{ui:SymbolIcon Symbol=Dismiss24}"
+                                   Width="34" Height="34"
+                                   Padding="0"
+                                   Appearance="Transparent"
+                                   ToolTip="关闭详情"
+                                   Command="{Binding DataContext.CloseDetailCommand,
+                                             RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                    </Grid>
+
+                    <!-- Error banner -->
+                    <Border Grid.Row="1"
+                            Margin="0,0,0,12"
+                            Padding="12,8"
+                            CornerRadius="10"
+                            Background="#26F87171"
+                            BorderBrush="#4DF87171"
+                            BorderThickness="1"
+                            Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="ErrorCircle24"
+                                           FontSize="16"
+                                           Foreground="{StaticResource DangerBrush}" />
+                            <TextBlock Text="{Binding ErrorMessage}"
+                                       Margin="8,0,0,0"
+                                       FontSize="12"
+                                       TextWrapping="Wrap"
+                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Body -->
+                    <ScrollViewer Grid.Row="2"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="340" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,14,0">
+                                <!-- Map -->
+                                <Border Style="{StaticResource CardStyle}"
+                                        Padding="0"
+                                        CornerRadius="16"
+                                        ClipToBounds="True">
+                                    <Grid Height="300" Background="#FF0B131C">
+                                        <Viewbox Stretch="Uniform">
+                                            <Canvas Width="640" Height="300" ClipToBounds="True">
+                                                <Canvas.Background>
+                                                    <DrawingBrush TileMode="Tile"
+                                                                  Viewport="0,0,64,64"
+                                                                  ViewportUnits="Absolute">
+                                                        <DrawingBrush.Drawing>
+                                                            <GeometryDrawing Geometry="M0,0 L0,64 M0,0 L64,0">
+                                                                <GeometryDrawing.Pen>
+                                                                    <Pen Brush="#0DFFFFFF" Thickness="1" />
+                                                                </GeometryDrawing.Pen>
+                                                            </GeometryDrawing>
+                                                        </DrawingBrush.Drawing>
+                                                    </DrawingBrush>
+                                                </Canvas.Background>
+                                                <ItemsControl ItemsSource="{Binding MapTiles}"
+                                                              Width="640"
+                                                              Height="300">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <Canvas />
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemContainerStyle>
+                                                        <Style TargetType="ContentPresenter">
+                                                            <Setter Property="Canvas.Left" Value="{Binding Left}" />
+                                                            <Setter Property="Canvas.Top" Value="{Binding Top}" />
+                                                        </Style>
+                                                    </ItemsControl.ItemContainerStyle>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Image Source="{Binding Image}"
+                                                                   Width="256" Height="256" Stretch="Fill" />
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                                <Border Width="640" Height="300"
+                                                        Background="#330A0F16"
+                                                        IsHitTestVisible="False" />
+                                                <Polyline Points="{Binding RoutePoints}"
+                                                          Stroke="{DynamicResource AccentBrush}"
+                                                          StrokeThickness="4"
+                                                          StrokeLineJoin="Round"
+                                                          StrokeStartLineCap="Round"
+                                                          StrokeEndLineCap="Round"
+                                                          IsHitTestVisible="False" />
+                                                <Ellipse Width="12" Height="12"
+                                                         Fill="{StaticResource SuccessBrush}"
+                                                         Stroke="#FF0A0F16"
+                                                         StrokeThickness="2"
+                                                         Canvas.Left="{Binding StartLeft}"
+                                                         Canvas.Top="{Binding StartTop}" />
+                                                <Ellipse Width="12" Height="12"
+                                                         Fill="{StaticResource DangerBrush}"
+                                                         Stroke="#FF0A0F16"
+                                                         StrokeThickness="2"
+                                                         Canvas.Left="{Binding EndLeft}"
+                                                         Canvas.Top="{Binding EndTop}" />
+                                            </Canvas>
+                                        </Viewbox>
+
+                                        <TextBlock Text="{Binding TileHint}"
+                                                   FontSize="10"
+                                                   Foreground="{StaticResource TextMutedBrush}"
+                                                   HorizontalAlignment="Left"
+                                                   VerticalAlignment="Bottom"
+                                                   Margin="12,0,0,9"
+                                                   Visibility="{Binding TileHint, Converter={StaticResource StringToVisibility}}" />
+
+                                        <TextBlock Text="{Binding MapAttribution}"
+                                                   FontSize="9"
+                                                   Foreground="#B3FFFFFF"
+                                                   HorizontalAlignment="Right"
+                                                   VerticalAlignment="Bottom"
+                                                   Margin="0,0,10,7"
+                                                   Visibility="{Binding HasMapTiles, Converter={StaticResource BoolToVisibility}}" />
+                                        <StackPanel HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Visibility="{Binding HasRoute,
+                                                                 Converter={StaticResource BoolToVisibility},
+                                                                 ConverterParameter=Invert}">
+                                            <ui:SymbolIcon Symbol="Map24"
+                                                           FontSize="26"
+                                                           Foreground="{StaticResource TextMutedBrush}"
+                                                           HorizontalAlignment="Center" />
+                                            <TextBlock Text="{Binding MapHint}"
+                                                       Margin="0,8,0,0"
+                                                       FontSize="12"
+                                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                                       HorizontalAlignment="Center" />
+                                        </StackPanel>
+
+                                        <!-- Track loading overlay: keep the metrics usable -->
+                                        <Border Background="#CC0B131C"
+                                                Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
+                                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <ui:ProgressRing IsIndeterminate="True"
+                                                                 Width="36" Height="36"
+                                                                 Foreground="{DynamicResource AccentBrush}" />
+                                                <TextBlock Text="正在读取活动轨迹…"
+                                                           Margin="0,10,0,0"
+                                                           FontSize="12"
+                                                           Foreground="{StaticResource TextSecondaryBrush}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Elevation profile -->
+                                <Border Style="{StaticResource CardStyle}"
+                                        Padding="18,14"
+                                        Margin="0,14,0,0"
+                                        Visibility="{Binding HasElevation, Converter={StaticResource BoolToVisibility}}">
+                                    <StackPanel>
+                                        <Grid>
+                                            <TextBlock Text="海拔剖面"
+                                                       FontSize="12.5"
+                                                       FontWeight="SemiBold" />
+                                            <TextBlock Text="{Binding ElevationCaption}"
+                                                       HorizontalAlignment="Right"
+                                                       Style="{StaticResource CaptionStyle}" />
+                                        </Grid>
+                                        <Viewbox Stretch="Uniform" Height="86" Margin="0,8,0,0">
+                                            <Canvas Width="640" Height="90">
+                                                <Line X1="0" Y1="88" X2="640" Y2="88"
+                                                      Stroke="{DynamicResource BorderBrushCustom}"
+                                                      StrokeThickness="1" />
+                                                <Polyline Points="{Binding ElevationPoints}"
+                                                          Stroke="{StaticResource InfoBrush}"
+                                                          StrokeThickness="2"
+                                                          StrokeLineJoin="Round" />
+                                            </Canvas>
+                                        </Viewbox>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1">
+                                <!-- Metrics -->
+                                <Border Style="{StaticResource CardStyle}" Padding="16,14">
+                                    <StackPanel>
+                                        <TextBlock Text="详细数据"
+                                                   FontSize="13"
+                                                   FontWeight="SemiBold"
+                                                   Margin="4,0,0,10" />
+                                        <ItemsControl ItemsSource="{Binding Metrics}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <UniformGrid Columns="2" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Background="{DynamicResource SurfaceAltBrush}"
+                                                            BorderBrush="{DynamicResource BorderSoftBrush}"
+                                                            BorderThickness="1"
+                                                            CornerRadius="10"
+                                                            Padding="12,10"
+                                                            Margin="0,0,8,8">
+                                                        <StackPanel>
+                                                            <TextBlock Text="{Binding Label}"
+                                                                       Style="{StaticResource EyebrowStyle}" />
+                                                            <TextBlock Text="{Binding Value}"
+                                                                       FontSize="17"
+                                                                       FontWeight="SemiBold"
+                                                                       Margin="0,5,0,0"
+                                                                       Foreground="{Binding ValueBrush}" />
+                                                        </StackPanel>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Source file -->
+                                <Border Style="{StaticResource FlatCardStyle}" Margin="0,14,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="数据文件"
+                                                   Style="{StaticResource EyebrowStyle}" />
+                                        <TextBlock Text="{Binding SourceFileText}"
+                                                   Margin="0,7,0,0"
+                                                   FontSize="11.5"
+                                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                                   TextWrapping="Wrap" />
+                                        <ui:Button Content="在平台查看原始活动"
+                                                   Command="{Binding OpenOriginalCommand}"
+                                                   Style="{StaticResource GhostButtonStyle}"
+                                                   HorizontalAlignment="Left"
+                                                   Margin="-8,8,0,0"
+                                                   FontSize="11.5"
+                                                   Visibility="{Binding WebUrl, Converter={StaticResource StringToVisibility}}" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>

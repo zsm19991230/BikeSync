@@ -21,7 +21,8 @@ internal sealed record MyWhooshActivity(
     DateTimeOffset StartTime,
     double DistanceMeters,
     int DurationSeconds,
-    double ElevationMeters);
+    double ElevationMeters,
+    double? AveragePowerWatts);
 
 /// <summary>
 /// Minimal MyWhoosh Connect API client based on the public Android/web client flow.
@@ -237,7 +238,8 @@ internal sealed class MyWhooshApi
                     start.Value.ToLocalTime(),
                     Math.Max(0, ReadDouble(row, "distance") * 1000),
                     ParseDuration(ReadText(row, "rideDuration")),
-                    Math.Max(0, ReadDouble(row, "elevation"))));
+                    Math.Max(0, ReadDouble(row, "elevation")),
+                    HttpApi.ReadAveragePower(row)));
 
                 if (activities.Count >= query.MaxResults)
                 {
@@ -255,25 +257,35 @@ internal sealed class MyWhooshApi
         return activities;
     }
 
+    /// <summary>Returns the activity detail object exposed by the Connect API.</summary>
+    public async Task<JsonElement> GetActivityDetailAsync(
+        string token,
+        string activityId,
+        CancellationToken cancellationToken)
+    {
+        ValidateActivityId(activityId);
+        using var request = CreateRequest(
+            HttpMethod.Get,
+            ConnectBase + "activities/" + Uri.EscapeDataString(activityId),
+            token);
+        using var response = await _http.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        using var document = await HttpApi.ReadJsonAsync(response, PlatformId.MyWhoosh, cancellationToken)
+            .ConfigureAwait(false);
+        var data = document.RootElement.TryGetProperty("data", out var d)
+            ? d
+            : document.RootElement;
+        return data.Clone();
+    }
+
     public async Task<byte[]> DownloadFitAsync(
         string token,
         string activityId,
         CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(activityId) ||
-            !activityId.All(ch => char.IsAsciiLetterOrDigit(ch) || ch == '-'))
-        {
-            throw new PlatformApiException(PlatformId.MyWhoosh, 400, "MyWhoosh 活动 ID 无效。");
-        }
+        ValidateActivityId(activityId);
 
-        using var detailRequest = CreateRequest(
-            HttpMethod.Get,
-            ConnectBase + "activities/" + Uri.EscapeDataString(activityId),
-            token);
-        using var detailResponse = await _http.SendAsync(detailRequest, cancellationToken).ConfigureAwait(false);
-        using var detail = await HttpApi.ReadJsonAsync(detailResponse, PlatformId.MyWhoosh, cancellationToken)
+        var detailData = await GetActivityDetailAsync(token, activityId, cancellationToken)
             .ConfigureAwait(false);
-        var detailData = detail.RootElement.TryGetProperty("data", out var d) ? d : detail.RootElement;
         var fileId = ReadText(detailData, "userFileId");
         if (string.IsNullOrWhiteSpace(fileId))
         {
@@ -336,6 +348,15 @@ internal sealed class MyWhooshApi
         salt.CopyTo(output, 8);
         cipher.CopyTo(output, 16);
         return Convert.ToBase64String(output);
+    }
+
+    private static void ValidateActivityId(string activityId)
+    {
+        if (string.IsNullOrWhiteSpace(activityId) ||
+            !activityId.All(ch => char.IsAsciiLetterOrDigit(ch) || ch == '-'))
+        {
+            throw new PlatformApiException(PlatformId.MyWhoosh, 400, "MyWhoosh 活动 ID 无效。");
+        }
     }
 
     private static HttpRequestMessage CreateRequest(HttpMethod method, string url, string token)

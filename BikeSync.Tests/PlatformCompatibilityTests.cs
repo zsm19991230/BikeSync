@@ -1,3 +1,4 @@
+using System.Text.Json;
 using BikeSync.Core.Providers;
 
 namespace BikeSync.Tests;
@@ -34,5 +35,18 @@ public sealed class PlatformCompatibilityTests
         Assert.True(bytes.Length > 32);
         Assert.Equal("Salted__", System.Text.Encoding.ASCII.GetString(bytes, 0, 8));
         Assert.Equal(0, (bytes.Length - 16) % 16);
+    }
+
+    [Theory]
+    [InlineData("""{ "avgPower": 215 }""", 215d)]
+    [InlineData("""{ "average_power": "198.6" }""", 198.6)]
+    [InlineData("""{ "summary": { "averagePowerWatts": 232 } }""", 232d)]
+    [InlineData("""{ "power": 0 }""", null)]
+    [InlineData("""{ "title": "No power" }""", null)]
+    public void Average_power_is_extracted_from_list_summary_variants(string json, double? expected)
+    {
+        using var document = JsonDocument.Parse(json);
+
+        Assert.Equal(expected, HttpApi.ReadAveragePower(document.RootElement));
     }
 }

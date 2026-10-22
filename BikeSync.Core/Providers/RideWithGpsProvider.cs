@@ -380,7 +380,7 @@ public sealed class RideWithGpsProvider : IPlatformProvider
             MovingTimeSeconds = (int)(GetDouble(item, "moving_time") ?? 0),
             ElapsedTimeSeconds = (int)(GetDouble(item, "duration") ?? 0),
             ElevationGainMeters = GetDouble(item, "elevation_gain") ?? 0,
-            AveragePowerWatts = GetDouble(item, "avg_watts"),
+            AveragePowerWatts = GetDouble(item, "avg_watts") ?? HttpApi.ReadAveragePower(item),
             AverageHeartRate = ToInt(GetDouble(item, "avg_hr")),
             HasGps = GetDouble(item, "first_lat") is not null,
             SourceFileType = "fit",

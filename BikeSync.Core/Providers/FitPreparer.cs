@@ -7,6 +7,17 @@ namespace BikeSync.Core.Providers;
 
 internal sealed record FitPreparation(byte[] Content, string Summary, bool MetricsCalculated);
 
+internal sealed record FitRecordPoint(
+    DateTimeOffset Timestamp,
+    double? Latitude,
+    double? Longitude,
+    double? AltitudeMeters,
+    double? SpeedMetersPerSecond,
+    int? HeartRate,
+    int? Cadence,
+    int? PowerWatts,
+    double? DistanceMeters);
+
 /// <summary>
 /// Lossless-enough FIT patcher for uploads to iGPSPORT. MyWhoosh writes the session end
 /// timestamp (and sometimes no NP/IF/TSS) into the exported FIT. iGPSPORT reads the
@@ -139,6 +150,58 @@ internal static class FitPreparer
             : "已修正时间（功率采样不连续，未补充 NP/IF/TSS）";
         return new FitPreparation(output, summary, metrics is not null);
     }
+
+    /// <summary>Reads the per-second record messages as an activity track.</summary>
+    internal static IReadOnlyList<FitRecordPoint> ReadRecords(byte[] raw, DateTimeOffset fallbackStart)
+    {
+        ValidateOrThrow(raw);
+        var records = Parse(raw)
+            .OfType<DataFrame>()
+            .Select(frame => frame.Message)
+            .Where(message => message.Definition.Global == RecordGlobal)
+            .ToArray();
+
+        var points = new List<FitRecordPoint>(records.Length);
+        for (var index = 0; index < records.Length; index++)
+        {
+            var record = records[index];
+            var timestamp = record.Number(253) is { } seconds
+                ? DateTimeOffset.FromUnixTimeSeconds(FitEpoch + (long)seconds)
+                : fallbackStart.AddSeconds(index);
+
+            points.Add(new FitRecordPoint(
+                timestamp,
+                ToLatitude(record.Number(0)),
+                ToLongitude(record.Number(1)),
+                ToAltitude(record.Number(2)),
+                ToScaled(record.Number(6), 1000),
+                ToInt(record.Number(3)),
+                ToInt(record.Number(4)),
+                ToInt(record.Number(7)),
+                ToScaled(record.Number(5), 100)));
+        }
+
+        return points;
+    }
+
+    private static double? ToLatitude(ulong? raw) =>
+        raw is null or 0x7FFFFFFFUL
+            ? null
+            : (int)(uint)raw.Value * (180d / 2147483648d);
+
+    private static double? ToLongitude(ulong? raw) =>
+        raw is null or 0x7FFFFFFFUL
+            ? null
+            : (int)(uint)raw.Value * (180d / 2147483648d);
+
+    private static double? ToAltitude(ulong? raw) =>
+        raw is null ? null : raw.Value / 5d - 500d;
+
+    private static double? ToScaled(ulong? raw, double scale) =>
+        raw is null ? null : raw.Value / scale;
+
+    private static int? ToInt(ulong? raw) =>
+        raw is null ? null : (int)raw.Value;
 
     private static PowerMetrics? TryCalculateMetrics(
         IReadOnlyList<FitMessage> records,

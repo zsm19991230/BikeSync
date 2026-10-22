@@ -15,6 +15,10 @@ public sealed class AppPaths
         HistoryFile = Path.Combine(RootDirectory, "sync-history.json");
         ActivityCacheFile = Path.Combine(RootDirectory, "activity-cache.json");
         LogDirectory = Path.Combine(RootDirectory, "logs");
+        // Downloaded activity files are kept so reopening a detail view does not
+        // hit the platform again.
+        ActivityFileCacheDirectory = Path.Combine(RootDirectory, "activity-files");
+        MapTileCacheDirectory = Path.Combine(RootDirectory, "map-tiles");
         // Keep the default inside the per-user application data directory. The Documents
         // folder is sometimes protected by Controlled Folder Access or an enterprise policy.
         DefaultDownloadDirectory = Path.Combine(RootDirectory, "exports");
@@ -26,12 +30,16 @@ public sealed class AppPaths
     public string HistoryFile { get; }
     public string ActivityCacheFile { get; }
     public string LogDirectory { get; }
+    public string ActivityFileCacheDirectory { get; }
+    public string MapTileCacheDirectory { get; }
     public string DefaultDownloadDirectory { get; }
 
     public void EnsureCreated()
     {
         Directory.CreateDirectory(RootDirectory);
         Directory.CreateDirectory(LogDirectory);
+        Directory.CreateDirectory(ActivityFileCacheDirectory);
+        Directory.CreateDirectory(MapTileCacheDirectory);
         Directory.CreateDirectory(DefaultDownloadDirectory);
     }
 

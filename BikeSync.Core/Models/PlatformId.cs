@@ -108,6 +108,17 @@ public static class PlatformCatalog
 
     public static PlatformDescriptor Get(PlatformId id) => Descriptors[id];
 
+    public static string Initial(PlatformId id) => id switch
+    {
+        PlatformId.Strava => "S",
+        PlatformId.IntervalsIcu => "i",
+        PlatformId.RideWithGps => "R",
+        PlatformId.MyWhoosh => "M",
+        PlatformId.IGpsport => "I",
+        PlatformId.Xingzhe => "X",
+        _ => "?",
+    };
+
     public static bool TryGet(PlatformId id, out PlatformDescriptor descriptor) =>
         Descriptors.TryGetValue(id, out descriptor!);
 }

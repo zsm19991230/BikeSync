@@ -4,14 +4,14 @@ public sealed class AppSettings
 {
     public string DownloadDirectory { get; set; } = string.Empty;
     public bool SaveActivityCopies { get; set; } = true;
-    public string Theme { get; set; } = "Dark";
+    public string Theme { get; set; } = "ember";
     public StravaAppSettings Strava { get; set; } = new();
 
     public static AppSettings CreateDefault(string defaultDownloadDirectory) => new()
     {
         DownloadDirectory = defaultDownloadDirectory,
         SaveActivityCopies = true,
-        Theme = "Dark",
+        Theme = "ember",
         Strava = new StravaAppSettings(),
     };
 }

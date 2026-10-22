@@ -8,7 +8,7 @@
              d:DesignWidth="1080">
     <ScrollViewer VerticalScrollBarVisibility="Auto"
                   HorizontalScrollBarVisibility="Disabled">
-        <StackPanel Margin="0,0,0,12">
+        <StackPanel Margin="0,0,10,12">
             <Grid Margin="0,4,0,22">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -36,6 +36,117 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                    <!-- Theme -->
+                    <Border Style="{StaticResource CardStyle}" Padding="22" Margin="0,0,0,14">
+                        <StackPanel>
+                            <Grid>
+                                <StackPanel>
+                                    <TextBlock Text="主题配色" Style="{StaticResource SectionTitleStyle}" />
+                                    <TextBlock Text="选择后立即应用并自动保存。"
+                                               Style="{StaticResource CaptionStyle}"
+                                               Margin="0,5,0,0" />
+                                </StackPanel>
+                                <Border Style="{StaticResource PillStyle}" HorizontalAlignment="Right"
+                                        VerticalAlignment="Top">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse Width="7" Height="7"
+                                                 Fill="{Binding SelectedTheme.AccentHex,
+                                                        Converter={StaticResource HexToBrush}}"
+                                                 VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding SelectedTheme.Name}"
+                                                   FontSize="9.5"
+                                                   Margin="6,0,0,0"
+                                                   Foreground="{StaticResource TextSecondaryBrush}" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <ListBox ItemsSource="{Binding Themes}"
+                                     SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
+                                     Margin="0,14,0,0"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="2" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ListBoxItem}">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                        <Setter Property="Margin" Value="0,0,10,10" />
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                    <Border x:Name="Root"
+                                                            Background="{DynamicResource SurfaceAltBrush}"
+                                                            BorderBrush="{DynamicResource BorderSoftBrush}"
+                                                            BorderThickness="1"
+                                                            CornerRadius="12"
+                                                            Padding="12">
+                                                        <ContentPresenter />
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="Root"
+                                                                    Property="BorderBrush"
+                                                                    Value="{DynamicResource AccentBorderBrush}" />
+                                                        </Trigger>
+                                                        <Trigger Property="IsSelected" Value="True">
+                                                            <Setter TargetName="Root"
+                                                                    Property="BorderBrush"
+                                                                    Value="{DynamicResource AccentBrush}" />
+                                                            <Setter TargetName="Root"
+                                                                    Property="Background"
+                                                                    Value="{DynamicResource AccentTintBrush}" />
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Width="34" Height="34" CornerRadius="10"
+                                                    Background="{Binding AccentHex, Converter={StaticResource HexToBrush}}">
+                                                <ui:SymbolIcon Symbol="VehicleBicycle24"
+                                                               FontSize="16"
+                                                               Foreground="White"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center" />
+                                            </Border>
+                                            <StackPanel Grid.Column="1" Margin="10,0,6,0"
+                                                        VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}"
+                                                           FontSize="12.5"
+                                                           FontWeight="SemiBold" />
+                                                <TextBlock Text="{Binding Description}"
+                                                           FontSize="10.5"
+                                                           Foreground="{StaticResource TextMutedBrush}"
+                                                           Margin="0,3,0,0" />
+                                            </StackPanel>
+                                            <ui:SymbolIcon Grid.Column="2"
+                                                           Symbol="CheckmarkCircle24"
+                                                           FontSize="16"
+                                                           Foreground="{Binding AccentHex, Converter={StaticResource HexToBrush}}"
+                                                           VerticalAlignment="Center"
+                                                           Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisibility}}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </StackPanel>
+                    </Border>
+
                     <!-- Strava -->
                     <Border Style="{StaticResource CardStyle}" Padding="22">
                         <StackPanel>
@@ -93,8 +204,8 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Border Background="{StaticResource InputBackgroundBrush}"
-                                        BorderBrush="{StaticResource BorderSoftBrush}"
+                                <Border Background="{DynamicResource InputBackgroundBrush}"
+                                        BorderBrush="{DynamicResource BorderSoftBrush}"
                                         BorderThickness="1"
                                         CornerRadius="8"
                                         Padding="11,9">
@@ -111,7 +222,7 @@
                             </Grid>
 
                             <Border Background="#0DFFFFFF"
-                                    BorderBrush="{StaticResource BorderSoftBrush}"
+                                    BorderBrush="{DynamicResource BorderSoftBrush}"
                                     BorderThickness="1"
                                     CornerRadius="10"
                                     Padding="12"
@@ -335,7 +446,7 @@
                                          Maximum="100"
                                          Height="4"
                                          Margin="0,10,0,0"
-                                         Foreground="{StaticResource AccentBrush}"
+                                         Foreground="{DynamicResource AccentBrush}"
                                          Background="#1AFFFFFF"
                                          BorderThickness="0"
                                          Visibility="{Binding IsInstallingUpdate, Converter={StaticResource BoolToVisibility}}" />
@@ -371,7 +482,7 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Border Width="34" Height="34" CornerRadius="10"
-                                        Background="{StaticResource AccentGradientBrush}">
+                                        Background="{DynamicResource AccentGradientBrush}">
                                     <ui:SymbolIcon Symbol="VehicleBicycle24" FontSize="18"
                                                    Foreground="White"
                                                    HorizontalAlignment="Center"
